@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StageScope | Stages d'observation</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Navigation principale">
+        <a class="brand" href="#explorer" aria-label="StageScope">
+          <span class="brand-mark">SS</span>
+          <span>
+            <strong>StageScope</strong>
+            <small>Observation locale</small>
+          </span>
+        </a>
+
+        <nav class="nav-list">
+          <a href="#explorer" data-route="explorer" class="nav-link active">
+            <span aria-hidden="true">⌖</span>
+            Explorer
+          </a>
+          <a href="#etudiant" data-route="etudiant" class="nav-link">
+            <span aria-hidden="true">◌</span>
+            Profil etudiant
+          </a>
+          <a href="#entreprise" data-route="entreprise" class="nav-link">
+            <span aria-hidden="true">▣</span>
+            Espace entreprise
+          </a>
+          <a href="#offre" data-route="offre" class="nav-link">
+            <span aria-hidden="true">＋</span>
+            Publier une offre
+          </a>
+        </nav>
+
+        <section class="sidebar-panel">
+          <p class="eyebrow">Session</p>
+          <div id="session-summary"></div>
+        </section>
+
+        <button class="ghost-button" id="reset-demo" type="button">Reinitialiser la demo</button>
+      </aside>
+
+      <main>
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Alpes-de-Haute-Provence et Bouches-du-Rhone</p>
+            <h1>Stages d'observation dans les departements 04 et 13</h1>
+          </div>
+          <div class="topbar-actions">
+            <button class="secondary-button" type="button" data-jump="etudiant">Creer un profil etudiant</button>
+            <button class="primary-button" type="button" data-jump="entreprise">Inscrire une entreprise</button>
+          </div>
+        </header>
+
+        <section id="route-explorer" class="route is-visible" aria-labelledby="explorer-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Recherche</p>
+              <h2 id="explorer-title">Rechercher toutes les entreprises par secteur ou par ville</h2>
+            </div>
+            <div class="metric-strip" id="metrics"></div>
+          </div>
+
+          <section class="toolbar" aria-label="Filtres de recherche">
+            <label>
+              Secteur
+              <select id="sector-filter"></select>
+            </label>
+            <label>
+              Ville
+              <input id="city-filter" type="search" placeholder="Marseille, Manosque, Digne..." />
+            </label>
+            <label>
+              Periode
+              <select id="period-filter">
+                <option value="all">Toutes les periodes</option>
+                <option value="Fevrier">Fevrier</option>
+                <option value="Mars">Mars</option>
+                <option value="Avril">Avril</option>
+                <option value="Mai">Mai</option>
+                <option value="Juin">Juin</option>
+              </select>
+            </label>
+            <label class="toggle-row">
+              <input id="remote-filter" type="checkbox" />
+              Inclure les immersions hybrides
+            </label>
+          </section>
+
+          <div class="explorer-grid">
+            <section class="map-panel" aria-label="Carte des entreprises">
+              <div class="map-canvas" id="map-canvas">
+                <div class="map-moving-layer" id="map-moving-layer">
+                  <div class="map-land" aria-hidden="true"></div>
+                  <div class="map-neighborhoods" aria-hidden="true"></div>
+                  <div class="map-buildings" aria-hidden="true"></div>
+                  <div class="map-sea" aria-hidden="true"></div>
+                  <div class="map-park park-camargue" aria-hidden="true"></div>
+                  <div class="map-park park-luberon" aria-hidden="true"></div>
+                  <div class="map-park park-verdon" aria-hidden="true"></div>
+                  <div class="map-park park-alpes" aria-hidden="true"></div>
+                  <div class="map-park park-calanques" aria-hidden="true"></div>
+                  <div class="department-line line-rhone" aria-hidden="true"></div>
+                  <div class="department-line line-durance" aria-hidden="true"></div>
+                  <div class="department-line line-04-13" aria-hidden="true"></div>
+                  <div class="map-grid-lines" aria-hidden="true"></div>
+                  <div class="map-minor-roads" aria-hidden="true"></div>
+                  <div class="map-road road-a7" aria-hidden="true"></div>
+                  <div class="map-road road-a8" aria-hidden="true"></div>
+                  <div class="map-road road-a51" aria-hidden="true"></div>
+                  <div class="map-road road-a50" aria-hidden="true"></div>
+                  <div class="map-region region-north">Alpes-de-Haute-Provence</div>
+                  <div class="map-region region-west">Camargue</div>
+                  <div class="map-region region-center">Bouches-du-Rhone</div>
+                  <div class="map-region region-east">Verdon</div>
+                  <div class="map-region region-south">Mer Mediterranee</div>
+                </div>
+                <div class="map-road-label label-a7">A7</div>
+                <div class="map-road-label label-a8">A8</div>
+                <div class="map-road-label label-a51">A51</div>
+                <div class="map-road-label label-a50">A50</div>
+                <div id="map-cities"></div>
+                <div id="map-pins"></div>
+                <div class="map-controls" aria-label="Controle du zoom de la carte">
+                  <button class="map-control-button" id="map-zoom-out" type="button" title="Dezoomer" aria-label="Dezoomer">−</button>
+                  <span id="map-zoom-label" class="map-zoom-label">1x</span>
+                  <button class="map-control-button" id="map-zoom-in" type="button" title="Zoomer" aria-label="Zoomer">+</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="company-panel" aria-label="Annuaire des entreprises et offres">
+              <div class="panel-header">
+                <h3>Annuaire des entreprises</h3>
+                <span id="result-count" class="pill"></span>
+              </div>
+              <div id="company-list" class="stack-list"></div>
+            </section>
+          </div>
+        </section>
+
+        <section id="route-etudiant" class="route" aria-labelledby="student-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Candidat</p>
+              <h2 id="student-title">Creer ou mettre a jour un profil etudiant</h2>
+            </div>
+            <div class="topbar-actions">
+              <button class="secondary-button" type="button" id="new-student">Nouveau profil</button>
+              <button class="secondary-button" type="button" data-jump="explorer">Voir les offres</button>
+            </div>
+          </div>
+
+          <div class="form-dashboard-grid">
+            <form id="student-form" class="form-panel">
+              <label>Profil actif<select id="student-switch"></select></label>
+              <div class="form-row two">
+                <label>Nom complet<input name="name" required placeholder="Camille Martin" /></label>
+                <label>Niveau<input name="level" required placeholder="3e, 2de, BTS..." /></label>
+              </div>
+              <div class="form-row two">
+                <label>Ville<input name="city" required placeholder="Marseille" /></label>
+                <label>Email<input name="email" type="email" required placeholder="camille@email.fr" /></label>
+              </div>
+              <label>Secteurs recherches<select name="sectors" multiple size="5"></select></label>
+              <label>Presentation<textarea name="bio" required placeholder="Ce que je souhaite decouvrir, mes qualites, mes contraintes..."></textarea></label>
+              <div class="form-row two">
+                <label>Disponibilites<input name="availability" required placeholder="Mars, Avril" /></label>
+                <label>Mobilite<input name="mobility" required placeholder="15 km, transports, visio..." /></label>
+              </div>
+              <button class="primary-button" type="submit">Enregistrer mon profil</button>
+            </form>
+
+            <aside class="dashboard-panel">
+              <div class="panel-header">
+                <h3>Mes candidatures</h3>
+                <span class="pill" id="student-status-pill">Aucun profil actif</span>
+              </div>
+              <div id="student-dashboard" class="stack-list"></div>
+            </aside>
+          </div>
+        </section>
+
+        <section id="route-entreprise" class="route" aria-labelledby="company-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Recruteur</p>
+              <h2 id="company-title">Inscrire une entreprise et suivre les candidatures</h2>
+            </div>
+            <div class="topbar-actions">
+              <button class="secondary-button" type="button" id="new-company">Nouvelle entreprise</button>
+              <button class="primary-button" type="button" data-jump="offre">Publier une offre</button>
+            </div>
+          </div>
+
+          <div class="form-dashboard-grid">
+            <form id="company-form" class="form-panel">
+              <label>Entreprise active<select id="company-switch"></select></label>
+              <div class="form-row two">
+                <label>Nom de l'entreprise<input name="name" required placeholder="Atelier Vieux-Port" /></label>
+                <label>Secteur<select name="sector" required></select></label>
+              </div>
+              <div class="form-row two">
+                <label>Ville<input name="city" required placeholder="Aix-en-Provence" /></label>
+                <label>Contact<input name="contact" type="email" required placeholder="rh@entreprise.fr" /></label>
+              </div>
+              <div class="form-row two">
+                <label>Latitude<input name="lat" type="number" step="0.0001" min="43.02" max="44.78" value="43.5297" /></label>
+                <label>Longitude<input name="lng" type="number" step="0.0001" min="4.25" max="6.98" value="5.4474" /></label>
+              </div>
+              <label>Description<textarea name="description" required placeholder="Activite, metiers observes, conditions d'accueil..."></textarea></label>
+              <button class="primary-button" type="submit">Enregistrer l'entreprise</button>
+            </form>
+
+            <aside class="dashboard-panel">
+              <div class="panel-header">
+                <h3>Tableau de bord entreprise</h3>
+                <span class="pill" id="company-status-pill">Aucune entreprise active</span>
+              </div>
+              <div id="company-dashboard" class="stack-list"></div>
+            </aside>
+          </div>
+        </section>
+
+        <section id="route-offre" class="route" aria-labelledby="offer-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Offre</p>
+              <h2 id="offer-title">Poster une offre de stage d'observation</h2>
+            </div>
+          </div>
+
+          <form id="offer-form" class="form-panel wide-form">
+            <div class="form-row two">
+              <label>Entreprise<select name="companyId" required></select></label>
+              <label>Intitule<input name="title" required placeholder="Decouverte des metiers de la data" /></label>
+            </div>
+            <div class="form-row three">
+              <label>Periode<input name="period" required placeholder="Avril" /></label>
+              <label>Duree<input name="duration" required placeholder="3 a 5 jours" /></label>
+              <label>Places<input name="spots" type="number" min="1" max="20" value="2" required /></label>
+            </div>
+            <div class="form-row two">
+              <label>Modalite<select name="mode"><option>Presentiel</option><option>Hybride</option><option>Distanciel guide</option></select></label>
+              <label>Profil attendu<input name="studentProfile" required placeholder="Curieux, ponctuel, interesse par..." /></label>
+            </div>
+            <label>Programme<textarea name="program" required placeholder="Accueil, observation, mini-projet, restitution..."></textarea></label>
+
+            <div class="tutor-header">
+              <h3>Tuteurs de stage</h3>
+              <button class="secondary-button" id="add-tutor" type="button">Ajouter un tuteur</button>
+            </div>
+            <div id="tutors"></div>
+
+            <button class="primary-button" type="submit">Publier l'offre</button>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
